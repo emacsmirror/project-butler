@@ -1,0 +1,224 @@
+#+title: Project Butler
+#+author: Stefan Thesing
+#+language: en
+#+texinfo_dir_category: Emacs misc features
+#+texinfo_filename: project-butler.info
+#+texinfo_dir_title: Project Butler: (project-butler)
+#+texinfo_dir_desc: Extension to project.el to lay out buffers and windows
+
+#+HTML: <img src="images/all-laid-out.png" align="right">
+
+* Introduction
+
+Project Butler is a little add-on to Emacs' built-in =project.el=. It opens
+buffers and windows for you and arranges them according to your specifications.
+
+* Installation
+
+Project Butler is not available on (M)ELPA, yet.
+
+To install it manually, clone the git repository to a directory of your choice,
+e.g. =~/project-butler/= and make it available to Emacs.
+
+For example:
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/project-butler/")
+  (require 'project-butler)
+#+end_src
+
+or using =use-package=:
+#+begin_src emacs-lisp
+  (use-package project-butler
+      :ensure nil
+      :load-path "~/project-butler/")
+  (require 'project-butler)
+#+end_src
+
+* Basic Configuration
+
+Project Butler provides a customization variable ~project-butler-projects-list~
+which is an association list using project directories as keys.
+
+Each project directory is mapped to a string describing a window pattern (see
+below) and a list of paths (files or directories) to be automatically opened.
+
+Example:
+#+begin_src emacs-lisp
+  (customize-set-variable 'project-butler-projects-list
+                          '(("~/my-projects/foo/" .     ; project
+                             ("1|2"                     ; window pattern
+                              ("foo.py" "README.md")))  ; path-list
+                            ("~/my-projects/bar/" .
+                             ("")
+                             ("cargo.toml" "src/" "src/main.rs"))))
+#+end_src
+
+** Window pattern syntax
+
+The pattern strings use a very simple syntax to describe the window layout and
+where the automatically opened buffers are placed.
+
+To be more specific, a window pattern string describes how to split and move
+windows after opening files in the path-list. So it's actually a command
+sequence. The following commands are valid:
+
+- Digits :: In the current window, open a path in the path-list. 1 means the
+  first path in the list, 2 means the second path and so on.
+- '_' :: Split the current window below and move the point to the new window.
+- '|' :: Split the current window to the right and move the point to the new
+  window.
+- '<' :: Move the point to the window to the left of the current window.
+- '>' :: Move the point to the window to the right of the current window.
+- 'v' :: Move the point to the window below the current window.
+- '^' :: Move the point to the window above the current window.
+
+Paths whose numbers are not explicitly mentioned in the pattern string are
+not displayed. They're opened in the background, instead.  
+
+If window-pattern is nil or an empty string("") or not given, all files in
+path-list will simply be opened in sequence, resulting in a single window
+containing a buffer of the last path in the list.
+
+*Examples:*
+
+In the following examples, an example string is given, followed by a diagram of
+the window layout, which buffer is opened where and where the point is ("*").
+We assume a path list containing 5 paths. Paths not displayed in a window are
+opened in the background.
+
+- "1|2"
+
+#+begin_src example 
+  |----|----|
+  |    |    |
+  | 1  | 2* |
+  |    |    |
+  |----|----|
+#+end_src
+  
+- "1|2<"  
+
+#+begin_src example  
+  |----|----|
+  |    |    |
+  | 1* | 2  |
+  |    |    |
+  |----|----|
+#+end_src
+
+- "1_2|3^"
+
+#+begin_src example  
+  |---------|
+  |    1*   |
+  |----|----|
+  |  2 | 3  |
+  |----|----|
+#+end_src
+  
+- "1|2_3<"
+
+#+begin_src example  
+  |----|----|
+  |    | 2  |
+  | 1* |----|
+  |    | 3  |
+  |----|----|
+#+end_src
+
+- "1_2"
+
+#+begin_src example  
+  |---------|
+  |    1    |
+  |---------|
+  |    2*   |
+  |---------|
+#+end_src
+  
+- "1|2_4<3"
+
+#+begin_src example  
+  |----|----|
+  | 1  | 2  |
+  |----|----|
+  | 3* | 4  |
+  |----|----|
+#+end_src
+
+- ""
+
+#+begin_src example  
+  |---------|
+  |         |
+  |    5*   |
+  |         |
+  |---------|
+#+end_src
+  
+* Usage
+
+** Opening projects
+   Emacs' built-in =project.el= provides a couple of actions to take when
+   switching to a projects, the ~project-switch-commands~ (usually bound to
+   =C-x p p=).
+
+   Project Butler adds one more option which calls ~project-butler-open~, which in
+   turn not only opens the project but looks up the project path in your config
+   (see [[* Basic Configuration][above]]) and opens buffers according to your settings.
+
+   [[./images/open-buffers-option.png]]
+
+   So the usual way to open a project using project butler is:
+
+   1. =C-x p p= (project-switch-project)
+   2. Pick your project in the minibuffer
+   3. Hit =o= to have Project Butler open and lay out your buffers for you.
+  
+** Closing projects
+   Project Butler will clean up for you, too. It provides the command
+   ~project-butler-cleanup~, which will close all buffers specified in the path
+   list. Additionaly, it calls ~project-kill-buffers~, thus closing all the
+   buffers belonging to the project. All window splits in the current frame
+   are reverted, too.
+
+* Recommended key binding
+
+  Consider binding ~project-butler-cleanup~ to =C-x p k=, which is usually
+  bound to ~project-kill-buffers~.
+
+  #+begin_src emacs-lisp
+    ;; Replace the binding C-x p k, originally bound to `project-kill-buffers'    
+    (keymap-set project-prefix-map "k" #'project-butler-cleanup)
+  #+end_src
+
+  Or on older Emacs versions:
+ #+begin_src emacs-lisp
+   (define-key project-prefix-map (kbd "k") #'project-butler-cleanup)    
+  #+end_src
+  
+* Customization
+
+  - ~project-butler-projects-list~ (see [[* Basic Configuration][above]])
+  - ~project-butler-confirm-cleanup~; Default: t
+    Ask the user to confirm when using ~project-butler-cleanup~. Set to nil to
+    ask no longer.
+  - ~project-butler-add-open-command~; Default: t
+    Add ~project-butler-open~ to the standard Emacs ~project-switch-commands~. Set
+    to nil to prevent this.  
+
+* Support
+
+  If you have questions, feel free to open an issue in the [[https://codeberg.org/jabbo/project-butler][git repo]].
+
+* License
+
+  [[file:LICENSE][GPL 3 or later]]
+  
+* Alternatives
+
+  - Karthink's [[https://github.com/karthink/project-x][project-x]]
+    see also:
+    [[https://karthinks.com/software/persistent-project-switching-in-emacs/][Persistent project switching in Emacs]]
+  - alphapapa's [[https://github.com/alphapapa/burly.el][burly]]  
+
