@@ -12,6 +12,7 @@
 
 Project Butler is a little add-on to Emacs' built-in =project.el=. It opens
 buffers and windows for you and arranges them according to your specifications.
+It also cleans up after you.
 
 * Installation
 
@@ -174,11 +175,13 @@ opened in the background.
    1. =C-x p p= (project-switch-project)
    2. Pick your project in the minibuffer
    3. Hit =o= to have Project Butler open and lay out your buffers for you.
-  
+
+#+HTML: <img src="images/demo-C-x-p-p-o.gif">
+   
 ** Closing projects
    Project Butler will clean up for you, too. It provides the command
    ~project-butler-cleanup~, which will close all buffers specified in the path
-   list. Additionaly, it calls ~project-kill-buffers~, thus closing all the
+   list. Additionally, it calls ~project-kill-buffers~, thus closing all the
    buffers belonging to the project. All window splits in the current frame
    are reverted, too.
 
