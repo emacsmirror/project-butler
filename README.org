@@ -19,7 +19,8 @@ It also cleans up after you.
 Project Butler is not available on (M)ELPA, yet.
 
 To install it manually, clone the git repository to a directory of your choice,
-e.g. =~/project-butler/= and make it available to Emacs.
+e.g. =~/project-butler/= and make it available to Emacs. Please note that it
+requires Emacs 28.1 or later.
 
 For example:
 #+begin_src emacs-lisp

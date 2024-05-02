@@ -3,7 +3,10 @@
 ;; Copyright (C) 2024  Stefan Thesing
 
 ;; Author: Stefan Thesing <software@webdings.de>
-;; Keywords: convenience, projects 
+;; Keywords: convenience, projects
+;; Version: 0.2.0
+;; Package-Requires: ((emacs "28.1"))
+;; URL: https://codeberg.org/jabbo/project-butler
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,27 +23,24 @@
 
 ;;; Commentary:
 
-;; 
+;; Add-on for project.el to automatically open and arrange project related
+;; buffers and windows.
 
 ;;; Code:
 
+;;;; Requirement
+(require 'project)
+
+;;;; Customizations
 (defgroup project-butler '()
-  "Customization for `project-butler'"
+  "Customization for `project-butler'."
   :tag "Project Butler"
   :group 'project)
 
 (defcustom project-butler-projects-list '()
-  "A list that maps project directories to a window pattern and a lists of
-files to be automatically opened by `project-butler-open'.
-
-Example:
-(customize-set-variable 'project-butler-projects-list
-  '((\"~/my-projects/foo/\" .     ; project
-      (\"1|2\"                    ; window pattern
-      (\"foo.py\" \"README.md\")))  ; path-list
-    (\"~/my-projects/bar/\" .
-      (\"\")
-      (\"cargo.toml\" \"src/\" \"src/main.rs\"))))"
+  "A list that maps project directories to parameters.
+These parameters are a window pattern and a lists of
+files to be automatically opened by `project-butler-open'."
   :type 'list
   :group 'project-butler)
 
@@ -50,16 +50,16 @@ Example:
   :group 'project-butler)
 
 (defcustom project-butler-add-open-command t
-  "Project Butler adds `project-butler-open' to the standard Emacs
-`project-switch-commands'. You can prevent this by setting
-`project-butler-add-open-command' to nil."
+  "Add `project-butler-open' to `project-switch-commands'.
+These are offered to the user when switching projects."
   :type 'boolean
   :group 'project-butler)
 
 
+;;;; Commands
 (defun project-butler-open (&optional proj-dir)
-  "Lookup PROJ-DIR in the 'project-butler-projects-list' variable, read the
-defined window pattern and path list and finally open the buffers."
+  "Lookup PROJ-DIR in the `project-butler-projects-list' variable.
+Read the defined window pattern and path list and finally open the buffers."
   (interactive)
   (unless proj-dir
     (setq proj-dir (car (last (project-current t))))) ; project picked by user
@@ -71,9 +71,9 @@ defined window pattern and path list and finally open the buffers."
     (project-butler--place-buffers proj-dir path-list window-pattern)))
 
 (defun project-butler-cleanup ()
-  "Clean up the project, i.e. close all buffers that are in its path-list and
-(optionally) of files in the project directory. Revert all window splits in
-the current frame."
+  "Clean up the project.
+Close all buffers that are in its path-list and (optionally) of files in
+the project directory. Revert all window splits in the current frame."
   (interactive)
   (let ((root (project-root (project-current nil))))
     (when (or (not project-butler-confirm-cleanup)
@@ -82,8 +82,9 @@ the current frame."
       (delete-other-windows))))
 
 
+;;;; Functions
 (defun project-butler--ensure-pattern (path-list window-pattern)
-  "Check if `window-pattern' is within bounds of `path-list'.
+  "Check if WINDOW-PATTERN is within bounds of PATH-LIST.
 Throw an error if any number in window-pattern exceeds the length
 of path-list."
   ;; check for invalid characters
@@ -101,11 +102,11 @@ of path-list."
         ;; path-list
         (when (cl-some (lambda (n) (> n (length path-list))) pattern-numbers)
           (error "Number in window-pattern exceeds length of path-list!")))
-    (error "Invalid window-pattern.")))
+    (error "Invalid window-pattern")))
 
 (defun project-butler--normalize-path (path base-directory)
-  "Normalize `path'. If it's not absolute, expand it relative to
-`base-directory'."
+  "Normalize PATH.
+If it's not absolute, expand it relative to BASE-DIRECTORY."
   (if (file-name-absolute-p path)
       path
     (expand-file-name path base-directory)))
@@ -113,20 +114,20 @@ of path-list."
 
 (defun project-butler--place-buffers
     (proj-dir path-list &optional window-pattern)
-  "Open all the paths in the `path-list' and arrange them in windows
-according to `window-pattern'. `window-pattern' is actually a
-command sequence. The following commands are valid:
+  "Open paths and arrange them in windows.
+Paths are specified by PATH-LIST, relative to PROJ-DIR.
+WINDOW-PATTERN is a command sequence. The following commands are valid:
 - Digits -- In the current window, open a path in the path-list. 1 means the
             first path in the list, 2 means the second path and so on.
-- '_' -- Split the current window below and move the point to the new window.
-- '|' -- Split the current window to the right and move the point to the new
+- `_' -- Split the current window below and move the point to the new window.
+- `|' -- Split the current window to the right and move the point to the new
          window.
-- '<' -- Move the point to the window to the left of the current window.
-- '>' -- Move the point to the window to the right of the current window.
-- 'v' -- Move the point to the window below the current window.
-- '^' -- Move the point to the window above the current window.
+- `<' -- Move the point to the window to the left of the current window.
+- `>' -- Move the point to the window to the right of the current window.
+- `v' -- Move the point to the window below the current window.
+- `^' -- Move the point to the window above the current window.
 
-Paths not explicitly mentioned in the `window-pattern' are opened
+Paths not explicitly mentioned in the WINDOW-PATTERN are opened
 in the background. See the documentation for details and examples."
   ;; Let's start by opening all the buffers for path-list
   (dolist (path path-list)
@@ -147,7 +148,7 @@ in the background. See the documentation for details and examples."
           (condition-case nil
               (cond ((string-match-p "[0-9]" char)
                      (let ((path (nth (1- (string-to-number char))
-                                      path-list)))                       
+                                      path-list)))
                        ;; we normalize paths here, as well
                        (find-file
                         (project-butler--normalize-path path proj-dir))))
