@@ -10,9 +10,9 @@
 
 * Introduction
 
-Project Butler is a little add-on to Emacs' built-in =project.el=. It opens
-buffers and windows for you and arranges them according to your specifications.
-It also cleans up after you.
+Project Butler is a little add-on to Emacs' built-in =project.el=. It lets you
+declare buffer/window arrangements in your config and lays them out for you. It
+also cleans up after you.
 
 * Installation
 
@@ -221,8 +221,47 @@ opened in the background.
   
 * Alternatives
 
+I know of the following packages that serve similar purposes:
+
   - Karthink's [[https://github.com/karthink/project-x][project-x]]
     see also:
     [[https://karthinks.com/software/persistent-project-switching-in-emacs/][Persistent project switching in Emacs]]
+  - alphapapa's [[https://github.com/alphapapa/activities.el][Activities]]
   - alphapapa's [[https://github.com/alphapapa/burly.el][burly]]  
 
+Especially Activities is very advanced and provides a lot of flexible and
+different uses, and does a lot more then Project Butler.
+
+** How is Project Butler different?
+
+*** Integration with =project.el=
+
+The first difference is its close integration with =project.el=. The other
+packages are largely project-agnostic. And if you only care about defining
+buffer and window arrangements, then one of the other packages might be a
+better fit for your needs.
+
+If (like me) you leverage =project.el= for a lot of small other things (like e.g.
+providing scope to ripgrep), it might matter to you.
+
+That said, it's probably easy to call the other packages' respective functions
+(like =activities-resume=) via hook after switching projects.
+
+*** "Your Desk as you left it" vs. "Return to a clean desk"
+
+The other packages provide a “pick-off-where-you-left-it” approach: save and
+resume. Project Butler declaratively defines a desired state with which to
+start out.
+
+So on first glance, it’s the difference between returning to your desk as you
+have left it or returning to a clean desk.
+
+But some of the other packages let you define a default state so you can return
+to a clean desk, too.
+
+So the real difference lies in the declarative nature of defining what you want.
+Activities e.g. let’s you take a snapshot and make it default, project-butler
+lets you declare what you want via text (i.e. in your emacs configuration).
+
+If you like to declaratively configure your setup in text and reproduce it on
+different machines, this might be preferable.
