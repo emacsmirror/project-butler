@@ -6,9 +6,9 @@
 #+texinfo_dir_title: Project Butler: (project-butler)
 #+texinfo_dir_desc: Extension to project.el to lay out buffers and windows
 
+#+HTML: <a href="https://melpa.org/#/project-butler"><img alt="MELPA" src="https://melpa.org/packages/project-butler-badge.svg"/></a>
+#+HTML: <a href="https://stable.melpa.org/#/project-butler"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/project-butler-badge.svg"/></a>
 #+HTML: <img src="images/all-laid-out.png" align="right">
-
-[[https://melpa.org/#/project-butler][file:https://melpa.org/packages/project-butler-badge.svg]] [[https://stable.melpa.org/#/project-butler][file:https://stable.melpa.org/packages/project-butler-badge.svg]]
 
 * Introduction
 
