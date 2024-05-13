@@ -8,6 +8,8 @@
 
 #+HTML: <img src="images/all-laid-out.png" align="right">
 
+[[https://melpa.org/#/project-butler][file:https://melpa.org/packages/project-butler-badge.svg]] [[https://stable.melpa.org/#/project-butler][file:https://stable.melpa.org/packages/project-butler-badge.svg]]
+
 * Introduction
 
 Project Butler is a little add-on to Emacs' built-in =project.el=. It lets you
@@ -16,7 +18,26 @@ also cleans up after you.
 
 * Installation
 
-Project Butler is not available on (M)ELPA, yet.
+** MELPA
+
+Project Butler is available on (M)ELPA. You can install it using the package
+manager of your choice, e.g. by running ~package-install~ and selecting
+=project-butler=.
+
+Or by adding it to the selected packages in your Emacs configuration before running
+~package-install-selected-packages~: 
+#+begin_src emacs-lisp
+  (add-to-list 'package-selected-packages 'project-butler)
+  (package-install-selected-packages :noconfirm)
+#+end_src
+
+Or using use-package:
+#+begin_src emacs-lisp
+  (use-package project-butler
+    :ensure t)
+#+end_src
+
+** Manually
 
 To install it manually, clone the git repository to a directory of your choice,
 e.g. =~/project-butler/= and make it available to Emacs. Please note that it
