@@ -59,7 +59,8 @@ These are offered to the user when switching projects."
 ;;;; Commands
 (defun project-butler-open (&optional proj-dir)
   "Lookup PROJ-DIR in the `project-butler-projects-list' variable.
-Read the defined window pattern and path list and finally open the buffers."
+Read the defined window pattern and path list and finally open the buffers.
+If the path-list is empty, open the project directory in dired."
   (interactive)
   (unless proj-dir
     (setq proj-dir (car (last (project-current t))))) ; project picked by user
@@ -68,7 +69,9 @@ Read the defined window pattern and path list and finally open the buffers."
                           nil nil 'string-equal))
          (window-pattern (car proj))
          (path-list (car (cdr proj))))
-    (project-butler--place-buffers proj-dir path-list window-pattern)))
+    (if path-list
+        (project-butler--place-buffers proj-dir path-list window-pattern)
+      (dired proj-dir))))
 
 (defun project-butler-cleanup ()
   "Clean up the project.

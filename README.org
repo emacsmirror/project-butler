@@ -198,6 +198,10 @@ opened in the background.
    2. Pick your project in the minibuffer
    3. Hit =o= to have Project Butler open and lay out your buffers for you.
 
+   If you try to do this for a project that you haven't configured (i.e. that
+   has an empty ~path-list~), ~project-butler-open~ will open the project directory
+   in dired.
+
 #+HTML: <img src="images/demo-C-x-p-p-o.gif">
    
 ** Closing projects
