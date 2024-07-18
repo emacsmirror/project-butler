@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Thesing <software@webdings.de>
 ;; Keywords: convenience, projects
-;; Version: 0.2.0
+;; Version: 0.4.0
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://codeberg.org/jabbo/project-butler
 
@@ -44,15 +44,28 @@ files to be automatically opened by `project-butler-open'."
   :type 'list
   :group 'project-butler)
 
+(defcustom project-butler-add-open-command t
+  "Add `project-butler-open' to `project-switch-commands'.
+These are offered to the user when switching projects."
+  :type 'boolean
+  :group 'project-butler)
+
+(defcustom project-butler-preparation '(delete-other-windows)
+  "A list of commands to be run before opening and placing buffers."
+  :type 'list
+  :group 'project-butler)
+
 (defcustom project-butler-confirm-cleanup t
   "Ask the user to confirm when using `project-butler-cleanup'."
   :type 'boolean
   :group 'project-butler)
 
-(defcustom project-butler-add-open-command t
-  "Add `project-butler-open' to `project-switch-commands'.
-These are offered to the user when switching projects."
-  :type 'boolean
+(defcustom project-butler-cleanup-commands
+  '((lambda () (project-kill-buffers :no-confirm))
+    delete-other-windows)
+  "A list of commands to be run during cleanup.
+By default, it kills all project buffers and removes all window splits."
+  :type 'list
   :group 'project-butler)
 
 
@@ -60,7 +73,7 @@ These are offered to the user when switching projects."
 (defun project-butler-open (&optional proj-dir)
   "Lookup PROJ-DIR in the `project-butler-projects-list' variable.
 Read the defined window pattern and path list and finally open the buffers.
-If the path-list is empty, open the project directory in dired."
+If the path-list is empty, open the project directory in Dired."
   (interactive)
   (unless proj-dir
     (setq proj-dir (car (last (project-current t))))) ; project picked by user
@@ -75,14 +88,16 @@ If the path-list is empty, open the project directory in dired."
 
 (defun project-butler-cleanup ()
   "Clean up the project.
-Close all buffers that are in its path-list and (optionally) of files in
-the project directory. Revert all window splits in the current frame."
+Run the commands defined in `project-butler-cleanup-commands'. By
+default, close all buffers that are in its path-list
+and (optionally) of files in the project directory. Revert all
+window splits in the current frame."
   (interactive)
   (let ((root (project-root (project-current nil))))
     (when (or (not project-butler-confirm-cleanup)
               (yes-or-no-p (format "Clean up project %s?" root)))
-      (project-kill-buffers :no-confirm)
-      (delete-other-windows))))
+      ;; Execute the the cleanup commands
+      (mapcar 'funcall project-butler-cleanup-commands))))
 
 
 ;;;; Functions
@@ -132,6 +147,8 @@ WINDOW-PATTERN is a command sequence. The following commands are valid:
 
 Paths not explicitly mentioned in the WINDOW-PATTERN are opened
 in the background. See the documentation for details and examples."
+  ;; Execute the preparatory commands
+  (mapc 'funcall project-butler-preparation)
   ;; Let's start by opening all the buffers for path-list
   (dolist (path path-list)
     ;; path list can contain absolute or relative paths, we normalize

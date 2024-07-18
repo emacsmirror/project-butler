@@ -25,7 +25,7 @@ manager of your choice, e.g. by running ~package-install~ and selecting
 =project-butler=.
 
 Or by adding it to the selected packages in your Emacs configuration before running
-~package-install-selected-packages~: 
+~package-install-selected-packages~:
 #+begin_src emacs-lisp
   (add-to-list 'package-selected-packages 'project-butler)
   (package-install-selected-packages :noconfirm)
@@ -96,7 +96,7 @@ sequence. The following commands are valid:
 - '^' :: Move the point to the window above the current window.
 
 Paths whose numbers are not explicitly mentioned in the pattern string are
-not displayed. They're opened in the background, instead.  
+not displayed. They're opened in the background, instead.
 
 If window-pattern is nil or an empty string("") or not given, all files in
 path-list will simply be opened in sequence, resulting in a single window
@@ -111,17 +111,17 @@ opened in the background.
 
 - "1|2"
 
-#+begin_src example 
+#+begin_src example
   |----|----|
   |    |    |
   | 1  | 2* |
   |    |    |
   |----|----|
 #+end_src
-  
-- "1|2<"  
 
-#+begin_src example  
+- "1|2<"
+
+#+begin_src example
   |----|----|
   |    |    |
   | 1* | 2  |
@@ -131,17 +131,17 @@ opened in the background.
 
 - "1_2|3^"
 
-#+begin_src example  
+#+begin_src example
   |---------|
   |    1*   |
   |----|----|
   |  2 | 3  |
   |----|----|
 #+end_src
-  
+
 - "1|2_3<"
 
-#+begin_src example  
+#+begin_src example
   |----|----|
   |    | 2  |
   | 1* |----|
@@ -151,17 +151,17 @@ opened in the background.
 
 - "1_2"
 
-#+begin_src example  
+#+begin_src example
   |---------|
   |    1    |
   |---------|
   |    2*   |
   |---------|
 #+end_src
-  
+
 - "1|2_4<3"
 
-#+begin_src example  
+#+begin_src example
   |----|----|
   | 1  | 2  |
   |----|----|
@@ -171,14 +171,14 @@ opened in the background.
 
 - ""
 
-#+begin_src example  
+#+begin_src example
   |---------|
   |         |
   |    5*   |
   |         |
   |---------|
 #+end_src
-  
+
 * Usage
 
 ** Opening projects
@@ -203,7 +203,7 @@ opened in the background.
    in dired.
 
 #+HTML: <img src="images/demo-C-x-p-p-o.gif">
-   
+
 ** Closing projects
    Project Butler will clean up for you, too. It provides the command
    ~project-butler-cleanup~, which will close all buffers specified in the path
@@ -217,15 +217,15 @@ opened in the background.
   bound to ~project-kill-buffers~.
 
   #+begin_src emacs-lisp
-    ;; Replace the binding C-x p k, originally bound to `project-kill-buffers'    
+    ;; Replace the binding C-x p k, originally bound to `project-kill-buffers'
     (keymap-set project-prefix-map "k" #'project-butler-cleanup)
   #+end_src
 
   Or on older Emacs versions:
  #+begin_src emacs-lisp
-   (define-key project-prefix-map (kbd "k") #'project-butler-cleanup)    
+   (define-key project-prefix-map (kbd "k") #'project-butler-cleanup)
   #+end_src
-  
+
 * Customization
 
   - ~project-butler-projects-list~ (see [[* Basic Configuration][above]])
@@ -234,7 +234,31 @@ opened in the background.
     ask no longer.
   - ~project-butler-add-open-command~; Default: t
     Add ~project-butler-open~ to the standard Emacs ~project-switch-commands~. Set
-    to nil to prevent this.  
+    to nil to prevent this.
+  - ~project-butler-preparation~; Default: ='(delete-other-windows)=.
+    By default, if you open a project in a frame that is already split
+    into more than one window, project butler will first close those windows,
+    so that your window pattern will take effect.
+    You can customize this in several ways:
+    - If you want to open a new frame instead, set it to ='(other-frame-prefix))=.
+    - If you want to open your pattern inside the present split, set it to ='()=.
+    - You can define a custom command here, too. More than one, in fact. It's a
+      list of commands, after all. The butler will execute all of them. Whether
+      your custom commands make sense in the context of opening a project is up
+      to you.
+  - ~project-butler-cleanup-commands~; Default: see below.
+    The ~project-butler-cleanup~ in fact runs a list of commands. This list is
+    customizable here.
+    By default the following commands are run:
+    - ~project-kill-buffers~ without asking for confirmation
+    - ~delete-other-windows~
+
+    Note: If you want to specify a command with optional parameters, you'll
+    have to specify it as a lambda expression. For example, in the default, the
+    no-confirm option for project-kill buffers is specified like this:
+    #+begin_src emacs-lisp
+      (customize-set-variable '((lambda () (project-kill-buffers :no-confirm))))
+    #+end_src
 
 * Support
 
@@ -243,7 +267,7 @@ opened in the background.
 * License
 
   [[file:LICENSE][GPL 3 or later]]
-  
+
 * Alternatives
 
 I know of the following packages that serve similar purposes:
@@ -252,7 +276,7 @@ I know of the following packages that serve similar purposes:
     see also:
     [[https://karthinks.com/software/persistent-project-switching-in-emacs/][Persistent project switching in Emacs]]
   - alphapapa's [[https://github.com/alphapapa/activities.el][Activities]]
-  - alphapapa's [[https://github.com/alphapapa/burly.el][burly]]  
+  - alphapapa's [[https://github.com/alphapapa/burly.el][burly]]
 
 Especially Activities is very advanced and provides a lot of flexible and
 different uses, and does a lot more then Project Butler.
