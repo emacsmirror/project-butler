@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-04-12
+
+- change default key for "Open buffers" to "b"
+  (used to be "o")
+
 ## [0.4.0] - 2024-07-18
 
 ### Added

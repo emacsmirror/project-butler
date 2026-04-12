@@ -193,7 +193,7 @@ in the background. See the documentation for details and examples."
 ;;Add `project-butler-open' to the commands of project.el
 (when project-butler-add-open-command
   (add-to-list 'project-switch-commands
-               '(project-butler-open "Open buffers" "o") :append ))
+               '(project-butler-open "Open buffers" "b") :append ))
 
 (provide 'project-butler)
 ;;; project-butler.el ends here
